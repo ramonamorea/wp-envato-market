@@ -38,7 +38,7 @@
       will never execute, showing a blank page.
 
       // SOLUTION 1
-            REPLACE THIS:
+            REPLACE THIS (line 89 below):
                 self.cache.$document.on( 'ready', function() {
 
             WITH THIS:
@@ -47,7 +47,7 @@
       
       
       // SOLUTION 2
-            REPLACE THIS:
+            REPLACE THIS (lines 89-100 below):
                     self.cache.$document.on( 'ready', function() {
                         self.addItem();
                         self.removeItem();
