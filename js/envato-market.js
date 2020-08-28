@@ -47,7 +47,7 @@
       
       
       // SOLUTION 2
-            REPLACE THIS (lines 89-100 below):
+            REPLACE THIS BLOCK (lines 89-100 below):
                     self.cache.$document.on( 'ready', function() {
                         self.addItem();
                         self.removeItem();
@@ -61,7 +61,7 @@
                         });
                      });
       
-             WITH THIS:
+             WITH THIS BLOCK:
                         var oldReady = jQuery.ready;
                         jQuery.ready = function(){
                           try{
