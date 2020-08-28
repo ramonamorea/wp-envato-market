@@ -28,6 +28,64 @@
 
       self.cache.$window.on( 'resize', $.proxy( self.tbPosition, self ) );
 
+      /* hevada:
+      
+      The blank settings page appears on Envato Market admin page, because some themes incorrectly enqueue their admin scripts, 
+      and somewhere an exception is thrown in theme $(document).ready(...) calls, which is stopping processing of the rest of other $(document).ready(...) blocks.
+      
+      This means that if a theme throws an error on its $(document).ready(...) admin page, this particular block of Envato Market code (lines 89-100 below):
+            self.cache.$document.on( 'ready', function() {...}
+      will never execute, showing a blank page.
+
+      // SOLUTION 1
+            REPLACE THIS:
+                self.cache.$document.on( 'ready', function() {
+
+            WITH THIS:
+                self.cache.$window.on( 'load', function() {
+      // END SOLUTION 1
+      
+      
+      // SOLUTION 2
+            REPLACE THIS:
+                    self.cache.$document.on( 'ready', function() {
+                        self.addItem();
+                        self.removeItem();
+                        self.tabbedNav();
+
+                        $( '.envato-card' ).on( 'click', 'a.thickbox', function() {
+                          tb_click.call( this );
+                          $( '#TB_title' ).css({ 'background-color': '#23282d', 'color': '#cfcfcf' });
+                          self.cache.$window.trigger( 'resize' );
+                          return false;
+                        });
+                     });
+      
+             WITH THIS:
+                        var oldReady = jQuery.ready;
+                        jQuery.ready = function(){
+                          try{
+                            self.addItem();
+                            self.removeItem();
+                            self.tabbedNav();
+
+                            $( '.envato-card' ).on( 'click', 'a.thickbox', function() {
+                              tb_click.call( this );
+                              $( '#TB_title' ).css({ 'background-color': '#23282d', 'color': '#cfcfcf' });
+                              self.cache.$window.trigger( 'resize' );
+                              return false;
+                            });
+
+                            return oldReady.apply(this, arguments);
+                          }catch(e){
+                            // handle e ....
+                            console.log(e);
+                          }
+                        };
+      // END SOLUTION 2
+      */ 
+      
+      // hevada: this is the problematic code, also see line 278 below.
       self.cache.$document.on( 'ready', function() {
         self.addItem();
         self.removeItem();
@@ -40,6 +98,7 @@
           return false;
         });
       });
+      // end hevada: this is the problematic code
     },
 
     addItem: function() {
@@ -216,7 +275,7 @@
       // Hide all panels
       $( 'div.panel', $wrap ).hide();
 
-      this.cache.$window.on( 'load', function() {
+      //this.cache.$window.on( 'load', function() {//hevada: we comment this because tabbedNav is already called on document ready, so it's not needed
         var tab = self.getParameterByName( 'tab' ),
           hashTab = window.location.hash.substr( 1 );
 
@@ -227,7 +286,7 @@
         } else {
           $( 'div.panel:not(.hidden)', $wrap ).first().show();
         }
-      });
+      //});//hevada: we comment this because tabbedNav is already called on document ready, so it's not needed
 
       // Listen for the click event.
       $( '.nav-tab-wrapper a', $wrap ).on( 'click', function() {
